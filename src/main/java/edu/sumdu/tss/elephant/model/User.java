@@ -47,7 +47,8 @@ public class User {
         } catch (NoSuchAlgorithmException e) {
             throw new HttpError500("Fail crypt user password", e);
         }
-        md.update(login.getBytes());
+        // Username encryption
+        md.update(username.getBytes());
         md.update(source.getBytes());
         byte[] bytes = md.digest();
         StringBuilder sb = new StringBuilder();

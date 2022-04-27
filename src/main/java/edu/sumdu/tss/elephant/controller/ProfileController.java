@@ -1,8 +1,10 @@
 package edu.sumdu.tss.elephant.controller;
 
+import edu.sumdu.tss.elephant.helper.DBPool;
 import edu.sumdu.tss.elephant.helper.Keys;
 import edu.sumdu.tss.elephant.helper.UserRole;
 import edu.sumdu.tss.elephant.helper.enums.Lang;
+import edu.sumdu.tss.elephant.helper.exception.NotFoundException;
 import edu.sumdu.tss.elephant.helper.utils.StringUtils;
 import edu.sumdu.tss.elephant.model.DbUserService;
 import edu.sumdu.tss.elephant.model.User;
@@ -10,6 +12,7 @@ import edu.sumdu.tss.elephant.model.UserService;
 import io.javalin.Javalin;
 import io.javalin.core.util.JavalinLogger;
 import io.javalin.http.Context;
+import org.sql2o.Connection;
 
 public class ProfileController extends AbstractController {
 
@@ -70,13 +73,22 @@ public class ProfileController extends AbstractController {
         context.redirect(BASIC_PAGE);
     }
 
-    public static void removeSelf(Context context) {
+
+    private static final String USER_BY_LOGIN_SQL = "SELECT * FROM users WHERE login = :login";
+    // The process of changing mail to a new one
+    public static void changeUserEmail(Context context) {
+        Connection con = DBPool.getConnection().open();
         User user = currentUser(context);
-        DbUserService.dropUser(user.getUsername());
-        //TODO: delete all user-specific files
-        //TODO: logout
-        //TODO: remove web-user from DB
-        context.redirect("/");
+        String login = context.formParam("user-email");
+        var emailUser = con.createQuery(USER_BY_LOGIN_SQL)
+                .addParameter("login", login).executeAndFetchFirst(User.class);
+        if (emailUser == null) {
+            user.setLogin(context.formParam("user-email"));
+            UserService.save(user);
+            context.sessionAttribute(Keys.INFO_KEY, "User email was changed");
+        }
+        else context.sessionAttribute(Keys.ERROR_KEY, "Email is already in use. Enter another one");
+        context.redirect(BASIC_PAGE);
     }
 
     public void register(Javalin app) {
@@ -85,8 +97,7 @@ public class ProfileController extends AbstractController {
         app.post(BASIC_PAGE + "/reset-db", ProfileController::resetDbPassword, UserRole.AUTHED);
         app.post(BASIC_PAGE + "/reset-api", ProfileController::resetApiPassword, UserRole.AUTHED);
         app.post(BASIC_PAGE + "/upgrade", ProfileController::upgradeUser, UserRole.AUTHED);
-        app.post(BASIC_PAGE + "/remove-self", ProfileController::removeSelf, UserRole.AUTHED);
+        app.post(BASIC_PAGE + "/change-email", ProfileController::changeUserEmail, UserRole.AUTHED);
         app.get(BASIC_PAGE, ProfileController::show, UserRole.AUTHED);
     }
-
 }

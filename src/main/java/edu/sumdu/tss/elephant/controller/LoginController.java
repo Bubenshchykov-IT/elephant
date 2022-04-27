@@ -11,6 +11,7 @@ import edu.sumdu.tss.elephant.helper.utils.ExceptionUtils;
 import edu.sumdu.tss.elephant.helper.utils.MessageBundle;
 import edu.sumdu.tss.elephant.helper.utils.ResponseUtils;
 import edu.sumdu.tss.elephant.helper.utils.ValidatorHelper;
+import edu.sumdu.tss.elephant.model.DbUserService;
 import edu.sumdu.tss.elephant.model.User;
 import edu.sumdu.tss.elephant.model.UserService;
 import io.javalin.Javalin;
@@ -146,6 +147,14 @@ public class LoginController extends AbstractController {
         ViewHelper.redirectBack(context);
     }
 
+    public static void deleteUser(Context context) {
+        User user = currentUser(context);
+        DbUserService.dropUser(user.getUsername(), user.getRole());
+        ResponseUtils.flush_flash(context);
+        context.sessionAttribute(Keys.SESSION_CURRENT_USER_KEY, null);
+        context.redirect(BASIC_PAGE);
+    }
+
     public void register(Javalin app) {
         app.get(BASIC_PAGE, LoginController::show, UserRole.ANYONE);
         app.post(BASIC_PAGE, LoginController::create, UserRole.ANYONE);
@@ -155,6 +164,6 @@ public class LoginController extends AbstractController {
         app.post(BASIC_PAGE + "/reset", LoginController::resetPassword, UserRole.ANYONE);
         app.get(BASIC_PAGE + "/lang/{lang}", LoginController::lang, UserRole.ANYONE);
         app.get("/logout", LoginController::destroy, UserRole.AUTHED);
+        app.get("/delete", LoginController::deleteUser, UserRole.AUTHED);
     }
-
 }

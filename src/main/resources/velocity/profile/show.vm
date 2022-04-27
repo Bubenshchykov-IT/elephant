@@ -15,4 +15,7 @@
 <div class="container shadow border p-5 mb-3">
     #parse("/velocity/profile/_password.vm")
 </div>
+<div class="container shadow border p-5 mb-3">
+    #parse("/velocity/profile/_email_change.vm")
+</div>
 #end

@@ -1,0 +1,23 @@
+<h3>Email change</h3>
+<form action="/profile/change-email" method="post">
+    <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <label for="username">Active email</label>
+                <input type="text" readonly class="form-control" id="username" aria-describedby="username-help"
+                       value="$currentUser.login">
+                <small id="username-help" class="form-text text-muted">Your active email</small>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label for="user-email">New email</label>
+                <input type="text" class="form-control" id="user-email" name="user-email"
+                       aria-describedby="user-email-help">
+                <small id="user-email-help" class="form-text text-muted">Enter your new email</small>
+        </div>
+    </div>
+    <div class="">
+        <button class="btn" type="submit">Change email</button>
+    </div>
+</form>

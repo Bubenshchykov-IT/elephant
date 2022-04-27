@@ -29,7 +29,7 @@ public class UserService {
                     "values (:login, :password, :role, :username, :dbPassword, :publicKey, :privateKey, :token)";
     private static final String UPDATE_SQL =
             "UPDATE users" +
-                    " SET password = :password, role = :role, username= :username, dbPassword=:dbPassword," +
+                    " SET login = :login, password = :password, role = :role, username= :username, dbPassword=:dbPassword," +
                     " publicKey = :publicKey, privateKey=:privateKey, token=:token, language= :language" +
                     " WHERE id = :id";
 
@@ -127,5 +127,16 @@ public class UserService {
             }
             return  user;
         }
+    }
+
+    public static void recursiveDelete(File file) {
+        if (!file.exists())
+            return;
+        if (file.isDirectory()) {
+            for (File f : file.listFiles()) {
+                recursiveDelete(f);
+            }
+        }
+        file.delete();
     }
 }

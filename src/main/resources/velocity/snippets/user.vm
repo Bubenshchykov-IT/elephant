@@ -7,6 +7,7 @@
             </a>
         </span>
         <a class="btn px-3 text-nowrap" href="/logout">$msg.get("controls.button.logout")</a>
+        <a class="btn px-3 text-nowrap" href="/delete">Delete account</a>
     #else
         #if ($lang.equals("EN"))
             <a class="btn px-3 text-nowrap" href="/login/lang/uk">🇺🇦</a>
